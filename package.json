@@ -1,7 +1,7 @@
 {
   "engines": {
-    "node": "22.13.1"
-  },
+  "node": "20.18.0"
+},
   "name": "dsa2026java",
   "version": "1.0.0",
   "scripts": {
