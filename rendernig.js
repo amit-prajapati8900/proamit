@@ -48,26 +48,29 @@ app.use(flash());
 const session = require("express-session");
 const MongoStore = require("connect-mongo")(session);
 
+// Make sure mongoose is connected before this line
+// mongoose.connect(dbUrl) ...
+
 app.use(session({
-  secret: process.env.SECRET_API,
+  secret: process.env.SECRET_API || "fallback-secret-change-this-immediately",
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   store: new MongoStore({
-    url: dbUrl,
+    mongooseConnection: mongoose.connection,   // ← best for v3
+    collection: "sessions",
+    ttl: 7 * 24 * 60 * 60,
+    autoRemove: "native",
+    touchAfter: 24 * 3600,
     crypto: {
-      secret:process.env.SECRET_API
-    },
-    touchAfter: 24 * 3600
+      secret: process.env.SECRET_API
+    }
   }),
   cookie: {
-    expires: new Date(Date.now() + 7*24*60*60*1000),
-    maxAge: 7*24*60*60*1000,
-    httpOnly: true
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production"
   }
 }));
-
-
-
 // password
 app.use(passport.initialize());
 app.use(passport.session());

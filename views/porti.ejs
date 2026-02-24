@@ -5,35 +5,331 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Prajapati • Creative Portfolio</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <link rel="stylesheet" href="/portfolio.css">
-  
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f9f9f9;
+    }
+
+    /* NAVBAR */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    #navbar.scrolled {
+      background: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #222;
+      letter-spacing: 1px;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: #333;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .nav-toggle {
+      display: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.8rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #444;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: #007bff;
+    }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 1.5rem;
+    }
+
+    .hero-content {
+      max-width: 900px;
+    }
+
+    .hero-content h1 {
+      font-size: clamp(2.2rem, 7vw, 4rem);
+      margin-bottom: 1rem;
+    }
+
+    .hero-content h2 {
+      font-size: clamp(1.1rem, 4vw, 1.6rem);
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 1.8rem;
+      margin: 0.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: white;
+      color: #007bff;
+    }
+
+    .btn-outline {
+      border: 2px solid white;
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+
+    /* PROJECTS */
+    #projects {
+      padding: 5rem 1rem 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.8rem, 5vw, 2.5rem);
+      margin-bottom: 2.5rem;
+      color: #222;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .project-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      transition: all 0.3s;
+    }
+
+    .project-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+    }
+
+    .project-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .project-info {
+      padding: 1.2rem;
+      text-align: center;
+    }
+
+    .project-info h3 {
+      margin-bottom: 0.6rem;
+      color: #007bff;
+    }
+
+    .project-info p {
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #222;
+      color: white;
+      text-align: center;
+      padding: 2.5rem 1rem;
+    }
+
+    .social-links a {
+      color: white;
+      font-size: 1.6rem;
+      margin: 0 1rem;
+      transition: color 0.3s;
+    }
+
+    .social-links a:hover {
+      color: #007bff;
+    }
+
+    /* RESPONSIVE FIXES */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+
+      .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: white;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.2rem;
+        padding: 1.5rem 0;
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.35s ease;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      }
+
+      #nav-toggle:checked ~ .nav-links {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Hamburger to X */
+      #nav-toggle:checked + .hamburger span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+
+      #nav-toggle:checked + .hamburger span:nth-child(2) {
+        opacity: 0;
+      }
+
+      #nav-toggle:checked + .hamburger span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
+      }
+
+      .nav-links a {
+        font-size: 1.15rem;
+        padding: 0.6rem 0;
+      }
+
+      #hero {
+        padding: 1rem;
+      }
+
+      #projects {
+        padding: 4rem 1rem 3rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 1.3rem;
+      }
+
+      .hero-content h1 {
+        font-size: 2rem;
+      }
+
+      .hero-content h2 {
+        font-size: 1rem;
+      }
+
+      .btn {
+        padding: 0.7rem 1.4rem;
+        font-size: 0.95rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
+  <!-- NAVBAR -->
   <nav id="navbar">
     <div class="nav-container">
       <div class="logo">AMIT PRAJAPATI</div>
+
+      <input type="checkbox" id="nav-toggle" class="nav-toggle">
+      <label for="nav-toggle" class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
       <ul class="nav-links">
-        <li><a href="#projects"class="active">ABOUT</a></li>
-        <li><a href="/api/home">PROJECT</a></li>
+        <li><a href="#hero" class="active">ABOUT</a></li>
+        <li><a href="#projects">PROJECTS</a></li>
         <li><a href="/api/about">ABOUT</a></li>
         <li><a href="#contact">CONTACT</a></li>
       </ul>
     </div>
   </nav>
+
+  <!-- HERO -->
   <section id="hero">
     <div class="hero-content">
       <h1>Creative Developer<br>& Designer</h1>
       <h2>Building beautiful, fast & meaningful digital experiences</h2>
       <div>
-        <a href="#projects" class="btn">View My Work</a>
-        <a href="" class="btn btn-outline">Let's Talk</a>
+        <a href="#projects" class="btn btn-primary">View My Work</a>
+        <a href="#contact" class="btn btn-outline">Let's Talk</a>
       </div>
     </div>
   </section>
 
+  <!-- PROJECTS -->
   <section id="projects">
-    <h2 class="section-title">PICTUTE</h2>
+    <h2 class="section-title">PROJECTS / PICTURES</h2>
     <div class="projects-grid">
 
       <div class="project-card">
@@ -48,20 +344,21 @@
         <div class="project-info">
           <h3>TEAM MEMBERS</h3>
           <h5>ASHUTOSH MAURYA</h5>
-
         </div>
       </div>
-<!-- New Project Added -->
+
       <div class="project-card">
         <img src="/images/Screenshot 2026-02-14 182109.png" alt="Project 4" class="project-img">
         <div class="project-info">
           <h3>OVERVIEWS PROJECT</h3>
-          <p>NODE.JS •JS & EJS • CRUD OPRATION AND ERROR HANDEL AND AUTHETICATION & AUTHORIZATION <p>
+          <p>Node.js • JS & EJS • CRUD Operations • Error Handling • Authentication & Authorization</p>
         </div>
       </div>
+
     </div>
   </section>
 
+  <!-- FOOTER -->
   <footer>
     <p>© 2026 Prajapati — Made with passion in Allahabad</p>
     <div class="social-links">
@@ -77,15 +374,17 @@
       document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
     });
 
-    // Smooth scroll for nav links
+    // Smooth scroll + close mobile menu
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function(e) {
         e.preventDefault();
         document.querySelector(this.getAttribute('href')).scrollIntoView({
           behavior: 'smooth'
         });
+        document.getElementById('nav-toggle').checked = false;
       });
     });
   </script>
+
 </body>
 </html>
