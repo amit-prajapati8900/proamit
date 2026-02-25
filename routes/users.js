@@ -36,7 +36,7 @@ router.get("/",(Listing.porti));
 router.get("/about",(Listing.about));
 
 
-router.get("/home",validedata,asyncError(Listing.showListing));
+router.get("/home",asyncError(Listing.showListing));
 // delete route
 router.delete("/delete/:id", athetication, asyncError(Listing.delete));
 
@@ -52,7 +52,7 @@ router.get("/new",athetication,(Listing.newData));
 
 
 // postnewdata
-router.post("/newdata", athetication, validedata, upload.single("img"),asyncError(Listing.postNewdata));
+router.post("/newdata", athetication,upload.single("img"),validedata,asyncError(Listing.postNewdata));
 
 // updatedata
 // router.get("/update/:id",athetication,validedata,asyncError(Listing.updateData ));
@@ -61,8 +61,8 @@ router.post("/newdata", athetication, validedata, upload.single("img"),asyncErro
 // binding same route path
 
 router.route("/update/:id")
-.get(athetication,validedata,asyncError(Listing.updateData ))
-.patch(athetication,validedata, upload.single("img"),asyncError(Listing.patchdata));
+.get(athetication,asyncError(Listing.updateData ))
+.patch(athetication, upload.single("img"),validedata,asyncError(Listing.patchdata));
 
 
 module.exports = router;
