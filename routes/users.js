@@ -47,10 +47,6 @@ router.get("/new",athetication,(Listing.newData));
 //    await alldata.save();
 //    req.flash("success", "Post successfully");
 //    res.redirect("/api/home");
-// }));
-
-
-
 // postnewdata
 router.post("/newdata", athetication,upload.single("img"),validedata,asyncError(Listing.postNewdata));
 

@@ -1,12 +1,12 @@
 {
   "engines": {
-    "node": "20.18.0"
+    "node": ">=20.18.0"
   },
   "name": "dsa2026java",
   "version": "1.0.0",
   "scripts": {
-    "start": "node rendernig.js",
-    "dev": "nodemon rendernig.js",
+    "start": "node --no-deprecation rendernig.js",
+    "dev": "nodemon --no-deprecation rendernig.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -19,15 +19,17 @@
     "bootstrap-icons": "^1.13.1",
     "cloudinary": "^2.5.1",
     "connect-flash": "^0.1.1",
-    "connect-mongo": "^3.2.0",
+    "connect-mongo": "^6.0.0",
     "dotenv": "^17.2.4",
     "ejs": "^4.0.1",
-    "express": "^4.21.0",
+    "express": "^4.22.1",
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.19.0",
     "joi": "^18.0.2",
     "method-override": "^3.0.0",
-    "mongoose": "^8.8.0",
+    "modern-flash": "^1.4.0",
+    "mongodb": "^7.1.0",
+    "mongoose": "^9.2.2",
     "multer": "^1.4.5-lts.2",
     "nodemon": "^3.1.11",
     "passport": "^0.7.0",

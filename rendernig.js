@@ -1,128 +1,112 @@
-// env
-if(process.env.NODE_ENV!="Production"){
-require('dotenv').config();
+// env loading - पहले रखो
+if (process.env.NODE_ENV !== "production") {
+  require('dotenv').config();
 }
-// console.log(process.env); 
-// env
-const mongoose = require("mongoose");
+
 const express = require("express");
-// const validedata = require("validedata");
- const validedata = require("./Error/vailidData.js");
-// const Insert = require("./insertData");
-// const mongoose = require("mongoose");
-// const multer=  require("multer");
-const app = express();
 const path = require("path");
-// const Data = require("./database/data.js");
-const ExpressError = require("./Error/ExpressError.js");
-// const Data = require("./insertData");
-// const asyncError = require("./Error/asyncError");
-// const session = require("express-session");
-// const MongoStore = require("connect-mongo");
-// const MongoStore = require("connect-mongo")(session);
-
-//cookies
-const flash = require("connect-flash");
-app.use(express.static('public'));
-
-//cookies
-const methodOverride = require('method-override');
-const userInfo = require("./routes/users.js"); 
-//password
+const mongoose = require("mongoose");
+const session = require("express-session");
+const { MongoStore } = require("connect-mongo");
+const flash = require("connect-flash");  // ← stable और working
+const methodOverride = require("method-override");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./database/Paswd.js");
-const signUp = require("./routes/signLogin.js");
-const dbUrl=process.env.ATLASDB_URL;
 
-//password
-app.use(methodOverride('_method'));
+const userInfo = require("./routes/users.js");
+const signUp = require("./routes/signLogin.js");
+
+const ExpressError = require("./Error/ExpressError.js");
+const validedata = require("./Error/vailidData.js");
+
+const app = express();
+
+const dbUrl = process.env.ATLASDB_URL;
+
+// Database Connect
+async function main() {
+  try {
+    await mongoose.connect(dbUrl);
+    console.log("Database is connected successfully");
+  } catch (err) {
+    console.error("Database connection error:", err);
+    process.exit(1);
+  }
+}
+
+main();
+
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(methodOverride('_method'));
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname,"views")));
-app.use(flash());
 
-const session = require("express-session");
-const MongoStore = require("connect-mongo")(session);
+app.use(express.static(path.join(__dirname, "public")));
 
-// Make sure mongoose is connected before this line
-// mongoose.connect(dbUrl) ...
+// Trust proxy
+app.set('trust proxy', 1);
 
+// Session + MongoStore
 app.use(session({
-  secret: process.env.SECRET_API || "fallback-secret-change-this-immediately",
+  secret: process.env.SECRET_API || 'your-strong-secret-here-change-it',
   resave: false,
   saveUninitialized: false,
-  store: new MongoStore({
-    mongooseConnection: mongoose.connection,   // ← best for v3
-    collection: "sessions",
-    ttl: 7 * 24 * 60 * 60,
-    autoRemove: "native",
-    touchAfter: 24 * 3600,
-    crypto: {
-      secret: process.env.SECRET_API
-    }
+  store: MongoStore.create({
+    mongoUrl: process.env.ATLASDB_URL,
+    collectionName: "sessions",
   }),
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production"
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
   }
 }));
-// password
+
+// Flash middleware - session के ठीक बाद
+app.use(flash());
+
+// Passport setup
 app.use(passport.initialize());
 app.use(passport.session());
-// app.use(new LocalStrategy(User.authorization()));
+
+// Passport config
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-// password
 
-main().then((res)=>{console.log("database is working")})
-.catch((err)=>{console.log(err)});
-
-
-async function main() {
-   await mongoose.connect(dbUrl);
-}
-//flash
-app.use((req,res,next)=>{
-   res.locals.successMSG = req.flash("success");
-   res.locals.Delete = req.flash("Delete");
-   res.locals.Update = req.flash("Update");
-   res.locals.error = req.flash("error");
-   res.locals.logops = req.user;
-   res.locals.currentUser = req.user;   // ← ab har ejs mein currentUser mil jayega
-   next();
-});
-
-// password
-
-// password
-
-app.use("/api",userInfo);
-app.use("/api",signUp);
-// Data.insertMany({
-//    name:"amit",
-//    deg:"AXC",
-//    age:23
-// })
-// .then(() => console.log("Data inserted"))
-//  .catch(err => console.error(err));
-
-// path exist nhi ho tab
+// Flash messages locals
 app.use((req, res, next) => {
-next(new ExpressError(404, "Page not found"));
+  res.locals.successMSG = req.flash("success");
+  res.locals.errorMSG   = req.flash("error");
+  res.locals.Delete     = req.flash("Delete");
+  res.locals.Update     = req.flash("Update");
+  res.locals.currentUser = req.user;
+  res.locals.logops     = req.user;
+  next();
 });
 
-// ERR
-app.use((err,req,res,next)=>{
-let {status=500, message="data not found"} = err;
-res.status(status).send(message);
-});
-app.listen(2000,()=>{
-   console.log("express is working");
+// Routes
+app.use("/api", userInfo);
+app.use("/api", signUp);
+
+// 404 handler
+app.all("*", (req, res, next) => {
+  next(new ExpressError(404, "Page not found"));
 });
 
+// Global error handler
+app.use((err, req, res, next) => {
+  const { status = 500, message = "Something went wrong" } = err;
+  res.status(status).send(message);
+});
+
+// Start server
+const PORT = process.env.PORT || 2000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
